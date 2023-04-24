@@ -48,6 +48,17 @@ Change it to:
 USAGE(1),           0x07,          // USAGE (Keyboard)
 ```
 
+## Pin code
+
+In `BLEKeyboard.cpp`, below `BLEDevice::init(deviceName);` add the following line:
+
+```cpp
+NimBLEDevice::setSecurityPasskey(111111);
+NimBLEDevice::setSecurityIOCap(BLE_HS_IO_DISPLAY_ONLY);
+```
+
+`111111` is the pin code, you can change it to whatever you want, but it has to be 6 digits.
+
 ## Implemented Events
 
 The single button on the motorcycle handlebar can trigger the following events:
