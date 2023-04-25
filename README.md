@@ -59,6 +59,14 @@ NimBLEDevice::setSecurityIOCap(BLE_HS_IO_DISPLAY_ONLY);
 
 `111111` is the pin code, you can change it to whatever you want, but it has to be 6 digits.
 
+## Enable NimBLE
+
+In `BLEKeyboard.h`, uncomment the following line:
+
+```cpp
+// #define USE_NIMBLE
+```
+
 ## Implemented Events
 
 The single button on the motorcycle handlebar can trigger the following events:
