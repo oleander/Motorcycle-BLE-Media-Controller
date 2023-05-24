@@ -1,0 +1,18 @@
+BasedOnStyle: LLVM
+BreakBeforeBraces: Attach
+AllowShortIfStatementsOnASingleLine: true
+IndentWidth: 2
+AlignConsecutiveAssignments: true
+SortIncludes: true
+BinPackArguments: true
+AlignTrailingComments: true
+AlignConsecutiveMacros: true
+SpaceBeforeParens: true
+SpaceBeforeRangeBasedForLoopColon: false
+SpaceInEmptyParentheses: false
+SpaceAfterCStyleCast: true
+AlignOperands: true
+ColumnLimit: 100
+BinPackParameters: true
+BinPackArguments: true
+
