@@ -149,11 +149,7 @@ void setup() {
   btn2.attachLongPressStop(longPressStopHandler2);
 
   if (rallyMode) {
-    bleKeyboard.press(KEY_LEFT_ALT);
-    bleKeyboard.press(KEY_LEFT_CTRL);
-    bleKeyboard.print('r');
-    delay(100);
-    bleKeyboard.releaseAll();
+    bleKeyboard.print('3');
   }
 }
 
