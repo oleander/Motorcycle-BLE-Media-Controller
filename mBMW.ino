@@ -148,7 +148,7 @@ void setup() {
   btn2.attachLongPressStart(longPressStartHandler2);
   btn2.attachLongPressStop(longPressStopHandler2);
 
-  if (rallyMode) {
+  if (rallyMode && bleKeyboard.isConnected()) {
     bleKeyboard.print('3');
   }
 }
