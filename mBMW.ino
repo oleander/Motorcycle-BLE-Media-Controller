@@ -14,10 +14,13 @@ BleKeyboard bleKeyboard("uBMW", "701", 100);
 #define OTA_ACTIVATION_TIME    10000
 #define OTA_INACTIVITY_TIMEOUT 600000 // 10 minutes in milliseconds
 
-OneButton btn1 = OneButton(BUTTON_PIN_1, true, true);
-OneButton btn2 = OneButton(BUTTON_PIN_2, true, true);
-bool rallyMode = false;
-int holdCount  = 0;
+OneButton btn1             = OneButton(BUTTON_PIN_1, true, true);
+OneButton btn2             = OneButton(BUTTON_PIN_2, true, true);
+bool rallyMode             = false;
+int holdCount              = 0;
+static int volumeFrequency = 500;
+unsigned long button1Held  = 0;
+unsigned long button2Held  = 0;
 
 void clickHandler1() {
   if (!bleKeyboard.isConnected()) return;
@@ -52,7 +55,7 @@ void tripleClickHandler1() {
 
 void longPressStartHandler1() {
   holdCount++;
-
+  button1Held = true;
   if (bleKeyboard.isConnected()) {
     bleKeyboard.write(KEY_MEDIA_VOLUME_DOWN);
     Serial.println("KEY_MEDIA_VOLUME_DOWN");
@@ -113,21 +116,23 @@ void attachDuringLongPressHandler2() {
 
 void longPressStartHandler2() {
   holdCount++;
-
+  button2Held = true;
   if (bleKeyboard.isConnected()) {
     bleKeyboard.write(KEY_MEDIA_VOLUME_UP);
+    Serial.println("KEY_MEDIA_VOLUME_UP");
   }
-
   Serial.println("[2] Button long press start");
 }
 
 void longPressStopHandler2() {
   holdCount--;
+  button2Held = false;
   Serial.println("[2] Button long press stop");
 }
 
 void longPressStopHandler1() {
   holdCount--;
+  button1Held = false;
   Serial.println("[1] Button long press stop");
 }
 
@@ -176,5 +181,19 @@ void loop() {
 
   if (holdCount == 2) {
     ESP.restart();
+  }
+
+  if (button1Held && ((millis() - button1Held) % volumeFrequency) == 0) {
+    if (bleKeyboard.isConnected()) {
+      bleKeyboard.write(KEY_MEDIA_VOLUME_DOWN);
+      Serial.println("KEY_MEDIA_VOLUME_DOWN");
+    }
+  }
+
+  if (button2Held && ((millis() - button2Held) % volumeFrequency) == 0) {
+    if (bleKeyboard.isConnected()) {
+      bleKeyboard.write(KEY_MEDIA_VOLUME_UP);
+      Serial.println("KEY_MEDIA_VOLUME_UP");
+    }
   }
 }
