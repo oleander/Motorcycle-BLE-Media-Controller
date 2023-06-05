@@ -7,8 +7,8 @@
 
 BleKeyboard bleKeyboard("uBMW", "701", 100);
 
-#define BUTTON_PIN_1           27
-#define BUTTON_PIN_2           26
+#define BUTTON_PIN_1           0
+#define BUTTON_PIN_2           27
 #define WIFI_SSID              "uBMW"
 #define WIFI_PWD               "11111111"
 #define OTA_ACTIVATION_TIME    10000
@@ -16,96 +16,157 @@ BleKeyboard bleKeyboard("uBMW", "701", 100);
 
 OneButton btn1 = OneButton(BUTTON_PIN_1, true, true);
 OneButton btn2 = OneButton(BUTTON_PIN_2, true, true);
+bool rallyMode = false;
+int holdCount  = 0;
 
-unsigned long otaActivationStartTime = 0;
-unsigned long lastOtaActivity;
-bool otaActive     = false;
-bool shouldRestart = false;
+void clickHandler1() {
+  if (!bleKeyboard.isConnected()) return;
 
-void clickHandler() {
-  if (bleKeyboard.isConnected()) {
-    bleKeyboard.write(KEY_MEDIA_PLAY_PAUSE);
+  if (rallyMode) {
+    bleKeyboard.write(KEY_MEDIA_VOLUME_DOWN);
+    Serial.println("KEY_MEDIA_VOLUME_DOWN");
+  } else {
+    Serial.println("NOP");
   }
 
-  if (otaActive) {
-    shouldRestart = true;
-  }
-
-  Serial.println("Button single click");
+  Serial.println("[1] Button single click");
 }
 
-void doubleClickHandler() {
-  if (bleKeyboard.isConnected()) {
-    bleKeyboard.write(KEY_MEDIA_NEXT_TRACK);
-  }
-
-  if (otaActive) {
-    shouldRestart = true;
-  }
-
-  Serial.println("Button double click");
-}
-
-void tripleClickHandler() {
+void doubleClickHandler1() {
   if (bleKeyboard.isConnected()) {
     bleKeyboard.write(KEY_MEDIA_PREVIOUS_TRACK);
+    Serial.println("KEY_MEDIA_PREVIOUS_TRACK");
   }
 
-  if (otaActive) {
-    shouldRestart = true;
-  }
-
-  Serial.println("Button triple click");
+  Serial.println("[1] Button double click");
 }
 
-void longPressStartHandler() {
+void tripleClickHandler1() {
+  if (bleKeyboard.isConnected()) {
+    bleKeyboard.write(KEY_MEDIA_EJECT);
+    Serial.println("KEY_MEDIA_EJECT");
+  }
+
+  Serial.println("[1] Button triple click");
+}
+
+void longPressStartHandler1() {
+  holdCount++;
+
   if (bleKeyboard.isConnected()) {
     bleKeyboard.write(KEY_MEDIA_VOLUME_DOWN);
+    Serial.println("KEY_MEDIA_VOLUME_DOWN");
   }
 
-  Serial.println("Button long press start");
+  Serial.println("[1] Button long press start");
 }
 
-void longPressStopHandler() {
-  if (!bleKeyboard.isConnected() && (millis() - otaActivationStartTime) >= OTA_ACTIVATION_TIME) {
-    enableOTA();
+void attachDuringLongPressHandler1() {
+  if (bleKeyboard.isConnected()) {
+    bleKeyboard.write(KEY_MEDIA_VOLUME_DOWN);
+    Serial.println("KEY_MEDIA_VOLUME_DOWN");
   }
 
-  Serial.println("Button long press stop");
+  Serial.println("[1] Button attach during long press");
+}
+
+void clickHandler2() {
+  if (!bleKeyboard.isConnected()) return;
+
+  if (rallyMode) {
+    bleKeyboard.write(KEY_MEDIA_VOLUME_UP);
+    Serial.println("KEY_MEDIA_VOLUME_UP");
+  } else {
+    bleKeyboard.write(KEY_MEDIA_PLAY_PAUSE);
+    Serial.println("KEY_MEDIA_PLAY_PAUSE");
+  }
+
+  Serial.println("[2] Button single click");
+}
+
+void doubleClickHandler2() {
+  if (bleKeyboard.isConnected()) {
+    bleKeyboard.write(KEY_MEDIA_NEXT_TRACK);
+    Serial.println("KEY_MEDIA_NEXT_TRACK");
+  }
+
+  Serial.println("[2] Button double click");
+}
+
+void tripleClickHandler2() {
+  if (bleKeyboard.isConnected()) {
+    bleKeyboard.print('1');
+    Serial.println("1");
+  }
+
+  Serial.println("[2] Button triple click");
+}
+
+void attachDuringLongPressHandler2() {
+  if (bleKeyboard.isConnected()) {
+    bleKeyboard.write(KEY_MEDIA_VOLUME_UP);
+    Serial.println("KEY_MEDIA_VOLUME_UP");
+  }
+
+  Serial.println("[2] Button attach during long press");
+}
+
+void longPressStartHandler2() {
+  holdCount++;
+
+  if (bleKeyboard.isConnected()) {
+    bleKeyboard.write(KEY_MEDIA_VOLUME_UP);
+  }
+
+  Serial.println("[2] Button long press start");
+}
+
+void longPressStopHandler2() {
+  holdCount--;
+  Serial.println("[2] Button long press stop");
+}
+
+void longPressStopHandler1() {
+  holdCount--;
+  Serial.println("[1] Button long press stop");
 }
 
 void setup() {
   Serial.begin(9600);
   Serial.println("Device started");
 
-  btn1.setClickTicks(400);
-  btn1.setDebounceTicks(100);
-  btn2.setClickTicks(400);
-  btn2.setDebounceTicks(100);
+  btn1.setClickMs(500);
+  btn2.setClickMs(500);
 
   bleKeyboard.begin();
 
-  btn1.attachClick(clickHandler);
-  btn1.attachDoubleClick(doubleClickHandler);
-  btn1.attachMultiClick(tripleClickHandler);
-  btn1.attachLongPressStart(longPressStartHandler);
-  btn1.attachLongPressStop(longPressStopHandler);
+  if (digitalRead(BUTTON_PIN_1) == LOW && digitalRead(BUTTON_PIN_2) == LOW) {
+    Serial.println("Enable rally mode");
+    rallyMode = true;
+  } else {
+    btn1.attachDoubleClick(doubleClickHandler1);
+    btn1.attachMultiClick(tripleClickHandler1);
+    btn1.attachDuringLongPress(attachDuringLongPressHandler1);
 
-  btn2.attachClick(clickHandler);
-  btn2.attachDoubleClick(doubleClickHandler);
-  btn2.attachMultiClick(tripleClickHandler);
-  btn2.attachLongPressStart(longPressStartHandler);
-  btn2.attachLongPressStop(longPressStopHandler);
-}
+    btn2.attachDoubleClick(doubleClickHandler2);
+    btn2.attachMultiClick(tripleClickHandler2);
+    btn2.attachDuringLongPress(attachDuringLongPressHandler2);
+  }
 
-void enableOTA() {
-  if (!otaActive) {
-    Serial.println("Enabling OTA");
-    WiFi.mode(WIFI_AP);
-    WiFi.softAP(WIFI_SSID, WIFI_PWD);
-    ArduinoOTA.begin();
-    otaActive       = true;
-    lastOtaActivity = millis();
+  btn1.attachClick(clickHandler1);
+  btn1.attachLongPressStart(longPressStartHandler1);
+  btn1.attachLongPressStop(longPressStopHandler1);
+
+  btn2.attachClick(clickHandler2);
+  btn2.attachLongPressStart(longPressStartHandler2);
+  btn2.attachLongPressStop(longPressStopHandler2);
+
+  if (rallyMode) {
+    bleKeyboard.press(KEY_LEFT_ALT);
+    bleKeyboard.press(KEY_LEFT_CTRL);
+    bleKeyboard.print('r');
+    delay(100);
+    bleKeyboard.releaseAll();
   }
 }
 
@@ -113,16 +174,7 @@ void loop() {
   btn1.tick();
   btn2.tick();
 
-  if (otaActive) {
-    ArduinoOTA.handle();
-
-    if (shouldRestart) {
-      ESP.restart();
-    }
-
-    if (millis() - lastOtaActivity >= OTA_INACTIVITY_TIMEOUT) {
-      Serial.println("OTA inactive for 10 minutes, restarting...");
-      ESP.restart();
-    }
+  if (holdCount == 2) {
+    ESP.restart();
   }
 }
