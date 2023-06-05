@@ -29,7 +29,8 @@ void clickHandler1() {
     bleKeyboard.write(KEY_MEDIA_VOLUME_DOWN);
     Serial.println("KEY_MEDIA_VOLUME_DOWN");
   } else {
-    Serial.println("NOP");
+    bleKeyboard.print('2');
+    Serial.println("Toggle ANC (2)");
   }
 
   Serial.println("[1] Button single click");
@@ -91,7 +92,7 @@ void doubleClickHandler2() {
 void tripleClickHandler2() {
   if (bleKeyboard.isConnected()) {
     bleKeyboard.print('1');
-    Serial.println("1");
+    Serial.println("Connect AirPods (1)");
   }
 
   Serial.println("[2] Button triple click");
