@@ -18,7 +18,7 @@ OneButton btn1             = OneButton(BUTTON_PIN_1, true, true);
 OneButton btn2             = OneButton(BUTTON_PIN_2, true, true);
 bool rallyMode             = false;
 int holdCount              = 0;
-static int volumeFrequency = 500;
+static int volumeFrequency = 250;
 unsigned long button1Held  = 0;
 unsigned long button2Held  = 0;
 
