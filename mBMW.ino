@@ -55,22 +55,14 @@ void tripleClickHandler1() {
 
 void longPressStartHandler1() {
   holdCount++;
-  button1Held = true;
+  button1Held = millis();
+
   if (bleKeyboard.isConnected()) {
     bleKeyboard.write(KEY_MEDIA_VOLUME_DOWN);
     Serial.println("KEY_MEDIA_VOLUME_DOWN");
   }
 
   Serial.println("[1] Button long press start");
-}
-
-void attachDuringLongPressHandler1() {
-  if (bleKeyboard.isConnected()) {
-    bleKeyboard.write(KEY_MEDIA_VOLUME_DOWN);
-    Serial.println("KEY_MEDIA_VOLUME_DOWN");
-  }
-
-  Serial.println("[1] Button attach during long press");
 }
 
 void clickHandler2() {
@@ -105,18 +97,9 @@ void tripleClickHandler2() {
   Serial.println("[2] Button triple click");
 }
 
-void attachDuringLongPressHandler2() {
-  if (bleKeyboard.isConnected()) {
-    bleKeyboard.write(KEY_MEDIA_VOLUME_UP);
-    Serial.println("KEY_MEDIA_VOLUME_UP");
-  }
-
-  Serial.println("[2] Button attach during long press");
-}
-
 void longPressStartHandler2() {
   holdCount++;
-  button2Held = true;
+  button2Held = millis();
   if (bleKeyboard.isConnected()) {
     bleKeyboard.write(KEY_MEDIA_VOLUME_UP);
     Serial.println("KEY_MEDIA_VOLUME_UP");
@@ -126,13 +109,13 @@ void longPressStartHandler2() {
 
 void longPressStopHandler2() {
   holdCount--;
-  button2Held = false;
+  button2Held = 0;
   Serial.println("[2] Button long press stop");
 }
 
 void longPressStopHandler1() {
   holdCount--;
-  button1Held = false;
+  button1Held = 0;
   Serial.println("[1] Button long press stop");
 }
 
@@ -151,11 +134,9 @@ void setup() {
   } else {
     btn1.attachDoubleClick(doubleClickHandler1);
     btn1.attachMultiClick(tripleClickHandler1);
-    btn1.attachDuringLongPress(attachDuringLongPressHandler1);
 
     btn2.attachDoubleClick(doubleClickHandler2);
     btn2.attachMultiClick(tripleClickHandler2);
-    btn2.attachDuringLongPress(attachDuringLongPressHandler2);
   }
 
   btn1.attachClick(clickHandler1);
